@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NovaPanel</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070b08;color:#eef6ef;font-family:Inter,system-ui,Arial}
+button,input,select{font:inherit}button{cursor:pointer}
+.wrap{max-width:1100px;margin:auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.logo{font-weight:800;font-size:24px}.logo i{color:#79ff61;font-style:normal}
+.wallet{background:#101a13;border:1px solid #223025;padding:10px 14px;border-radius:12px}
+.grid{display:grid;grid-template-columns:240px 1fr;gap:18px}
+aside,section{background:#0d140f;border:1px solid #1d291f;border-radius:18px}
+aside{padding:12px;height:max-content}nav button{width:100%;text-align:left;background:transparent;color:#92a095;border:0;padding:12px;border-radius:10px;margin:2px 0}
+nav button.active,nav button:hover{background:#18301b;color:#9bff86}
+main{padding:20px}.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#101911;border:1px solid #1d291f;border-radius:14px;padding:16px}.card small{color:#7e8d82}.card b{display:block;font-size:22px;margin-top:8px}
+.form{display:grid;gap:13px}.row{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+label{display:block;color:#87968b;font-size:11px;margin-bottom:6px}
+input,select{width:100%;background:#080e0a;color:#eef6ef;border:1px solid #263329;border-radius:10px;padding:12px;outline:none}
+input:focus,select:focus{border-color:#79ff61}
+.btn{background:#79ff61;color:#071007;border:0;border-radius:10px;padding:12px 16px;font-weight:800}
+.btn.alt{background:#17221a;color:#dce8df;border:1px solid #29382d}
+.notice{margin-top:12px;padding:12px;background:#0a100c;border:1px solid #1c281e;border-radius:10px;color:#91a095;font-size:12px;line-height:1.5}
+.service{display:flex;justify-content:space-between;padding:13px;border:1px solid #1b271e;background:#0a100c;border-radius:11px;margin:8px 0}
+.service small{display:block;color:#718075;margin-top:4px}.green{color:#79ff61}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #1b251d;font-size:12px}th{color:#748177}
+#auth,#confirmPage{max-width:460px;margin:10vh auto;background:#0d140f;border:1px solid #223025;border-radius:20px;padding:24px}
+.confirmIcon{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#18301b;border:1px solid #315236;color:#79ff61;font-size:30px;font-weight:900;margin-bottom:18px}
+.confirmIcon.error{background:#2a1515;border-color:#5d2a2a;color:#ff8d8d}
+.confirmActions{display:grid;gap:10px;margin-top:18px}
+.muted{color:#849287;line-height:1.6}
+.hidden{display:none!important}
+@media(max-width:800px){
+  .wrap{padding:16px 12px 92px}
+  header{gap:10px;align-items:center}
+  .logo{font-size:22px}
+  .wallet{padding:9px 11px;font-size:13px}
+  .grid{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .row{grid-template-columns:1fr}
+  aside{display:block;position:fixed;left:8px;right:8px;bottom:8px;z-index:50;padding:7px;border-radius:16px;background:#0d140ff2;backdrop-filter:blur(12px)}
+  aside nav{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+  aside nav button{margin:0;padding:8px 3px;text-align:center;font-size:0;min-height:52px}
+  aside nav button::first-line{font-size:0}
+  aside nav button:nth-child(1)::after{content:'Home';font-size:10px;display:block;margin-top:4px}
+  aside nav button:nth-child(2)::after{content:'Order';font-size:10px;display:block;margin-top:4px}
+  aside nav button:nth-child(3)::after{content:'Services';font-size:10px;display:block;margin-top:4px}
+  aside nav button:nth-child(4)::after{content:'Orders';font-size:10px;display:block;margin-top:4px}
+  aside nav button:nth-child(5)::after{content:'Wallet';font-size:10px;display:block;margin-top:4px}
+  aside nav button:nth-child(6)::after{content:'Logout';font-size:10px;display:block;margin-top:4px}
+  aside nav button{color:#aab6ad}
+  aside nav button.active{color:#9bff86;background:#18301b}
+  main{padding:0}
+  section{border-radius:16px;padding:16px}
+}
+
+</style>
+</head>
+<body>
+<div id="auth">
+  <div class="logo">Nova<i>Panel</i></div>
+  <p style="color:#849287">Sign in to continue</p>
+  <div class="form">
+    <div><label>EMAIL</label><input id="email" type="email" placeholder="you@example.com"></div>
+    <div><label>PASSWORD</label><input id="password" type="password" placeholder="••••••••"></div>
+    <button class="btn" onclick="login()">Sign In</button>
+    <button class="btn alt" onclick="register()">Create Account</button>
+  </div>
+  <div id="authMsg" class="notice hidden"></div>
+</div>
+
+<div id="confirmPage" class="hidden">
+  <div id="confirmIcon" class="confirmIcon">✓</div>
+  <div class="logo">Nova<i>Panel</i></div>
+  <h2 id="confirmTitle">Check your email</h2>
+  <p id="confirmText" class="muted">We sent a confirmation link to your email address. Open it to activate your NovaPanel account.</p>
+  <div id="confirmEmail" class="notice hidden"></div>
+  <div class="confirmActions">
+    <button id="confirmPrimary" class="btn" onclick="showLogin()">Back to Sign In</button>
+    <button id="confirmSecondary" class="btn alt" onclick="showLogin()">Use another account</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+<div class="wrap">
+<header><div class="logo">Nova<i>Panel</i></div><div style="display:flex;gap:8px;align-items:center"><div class="wallet">Wallet: <b id="wallet">₹0.00</b></div><button class="btn alt" onclick="logout()" style="padding:9px 11px">Logout</button></div></header>
+<div class="grid">
+<aside><nav>
+<button class="active" onclick="page('dashboard',this)">⌂ Dashboard</button>
+<button onclick="page('order',this)">＋ New Order</button>
+<button onclick="page('services',this)">◈ Services</button>
+<button onclick="page('orders',this)">▤ Orders</button>
+<button onclick="page('walletPage',this)">₹ Wallet</button>
+<button onclick="logout()">↪ Logout</button>
+</nav></aside>
+<main>
+<section id="dashboard" class="page active">
+<h2>Dashboard</h2>
+<div class="cards">
+<div class="card"><small>Orders</small><b id="ordersCount">0</b></div>
+<div class="card"><small>Pending</small><b id="pendingCount">0</b></div>
+<div class="card"><small>Services</small><b id="servicesCount">0</b></div>
+<div class="card"><small>Balance</small><b id="dashBalance">₹0.00</b></div>
+</div>
+<div class="notice">Production mode: provider credentials stay server-side. The browser never receives the FanSMM API key.</div>
+</section>
+
+<section id="order" class="page">
+<h2>New Order</h2>
+<div class="form">
+<div><label>SERVICE</label><select id="service"></select></div>
+<div class="row"><div><label>LINK</label><input id="link" placeholder="https://..."></div><div><label>QUANTITY</label><input id="qty" type="number" value="100"></div></div>
+<button class="btn" onclick="createOrder()">Place Order</button>
+<div id="orderMsg" class="notice hidden"></div>
+</div>
+</section>
+
+<section id="services" class="page">
+<h2>Services</h2><input id="search" placeholder="Search services..." oninput="renderServices()">
+<div id="serviceList"></div>
+</section>
+
+<section id="orders" class="page">
+<h2>My Orders</h2><div style="overflow:auto"><table><thead><tr><th>ID</th><th>Service</th><th>Qty</th><th>Status</th><th>Charge</th></tr></thead><tbody id="orderList"></tbody></table></div>
+</section>
+
+<section id="walletPage" class="page">
+<h2>Wallet</h2>
+<div class="card"><b id="walletLarge">₹0.00</b><p style="color:#819086">Wallet funding is intentionally not enabled in this starter. Connect an authorised payment provider on the server before accepting real money.</p></div>
+</section>
+</main>
+</div>
+</div>
+</div>
+
+<script>
+const state={services:[],orders:[],balance:0,user:null};
+const $=id=>document.getElementById(id);
+async function api(url,opts={}){const r=await fetch(url,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Request failed');return d}
+function msg(t){$('authMsg').textContent=t;$('authMsg').classList.remove('hidden')}
+function showConfirm({title='Check your email',text='We sent a confirmation link to your email address. Open it to activate your NovaPanel account.',email='',success=true}={}){
+  $('auth').classList.add('hidden');$('app').classList.add('hidden');$('confirmPage').classList.remove('hidden');
+  $('confirmTitle').textContent=title;$('confirmText').textContent=text;
+  $('confirmIcon').textContent=success?'✓':'!';$('confirmIcon').classList.toggle('error',!success);
+  if(email){$('confirmEmail').textContent=email;$('confirmEmail').classList.remove('hidden')}else{$('confirmEmail').classList.add('hidden')}
+}
+function showLogin(){history.replaceState(null,'',location.pathname);$('confirmPage').classList.add('hidden');$('app').classList.add('hidden');$('auth').classList.remove('hidden');$('password').value=''}
+function handleConfirmationRedirect(){
+  const hash=new URLSearchParams(location.hash.replace(/^#/,''));
+  const query=new URLSearchParams(location.search);
+  const type=hash.get('type')||query.get('type');
+  const error=query.get('error_description')||hash.get('error_description')||query.get('error')||hash.get('error');
+  if(error){history.replaceState(null,'',location.pathname);showConfirm({title:'Confirmation failed',text:decodeURIComponent(String(error).replace(/\+/g,' ')),success:false});return true}
+  if(type==='signup'||type==='email_change'||hash.get('access_token')){
+    history.replaceState(null,'',location.pathname);
+    showConfirm({title:'Email confirmed',text:'Your email address has been verified successfully. You can now sign in to NovaPanel.',success:true});
+    $('confirmPrimary').textContent='Continue to Sign In';$('confirmSecondary').classList.add('hidden');
+    return true
+  }
+  return false
+}
+async function register(){try{const email=$('email').value.trim(),password=$('password').value;const d=await api('/api/auth',{method:'POST',body:JSON.stringify({action:'register',email,password})});if(d.needsConfirmation){showConfirm({email,title:'Confirm your email',text:'We sent a verification link to this address. Open the email and tap the confirmation link, then return here to sign in.'})}else{msg(d.message||'Account created. Sign in now.')}}catch(e){msg(e.message)}}
+async function login(){try{const email=$('email').value,password=$('password').value;const d=await api('/api/auth',{method:'POST',body:JSON.stringify({action:'login',email,password})});localStorage.setItem('np_session',d.session);boot()}catch(e){msg(e.message)}}
+function logout(){localStorage.removeItem('np_session');location.reload()}
+async function boot(){const s=localStorage.getItem('np_session');if(!s)return;try{$('auth').classList.add('hidden');$('app').classList.remove('hidden');await load()}catch(e){localStorage.removeItem('np_session');$('app').classList.add('hidden');$('auth').classList.remove('hidden');msg(e.message||'Session expired. Please sign in again.')}}
+function page(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active')}
+async function load(){const d=await api('/api/panel',{headers:{Authorization:'Bearer '+localStorage.getItem('np_session')}});state.services=d.services||[];state.orders=d.orders||[];state.balance=d.balance||0;render()}
+function render(){ $('wallet').textContent='₹'+Number(state.balance).toFixed(2);$('walletLarge').textContent='₹'+Number(state.balance).toFixed(2);$('dashBalance').textContent='₹'+Number(state.balance).toFixed(2);$('ordersCount').textContent=state.orders.length;$('pendingCount').textContent=state.orders.filter(x=>String(x.status).toLowerCase().includes('pending')).length;$('servicesCount').textContent=state.services.length;renderServices();$('service').innerHTML=state.services.map(s=>`<option value="${s.service}">${s.service} — ${s.name} — ${s.rate}/1k</option>`).join('');$('orderList').innerHTML=state.orders.map(o=>`<tr><td>#${o.id}</td><td>${o.service_name||o.service}</td><td>${o.quantity}</td><td>${o.status}</td><td>${o.charge??''}</td></tr>`).join('')}
+function renderServices(){const q=($('search').value||'').toLowerCase();$('serviceList').innerHTML=state.services.filter(s=>(s.name+' '+s.category).toLowerCase().includes(q)).map(s=>`<div class="service"><div><b>${s.name}</b><small>${s.category} · ${s.min}–${s.max}</small></div><strong class="green">${s.rate}/1k</strong></div>`).join('')}
+async function createOrder(){try{const d=await api('/api/order',{method:'POST',headers:{Authorization:'Bearer '+localStorage.getItem('np_session')},body:JSON.stringify({service:$('service').value,link:$('link').value,quantity:Number($('qty').value)})});$('orderMsg').textContent='Order placed: #'+d.order;$('orderMsg').classList.remove('hidden');await load()}catch(e){$('orderMsg').textContent=e.message;$('orderMsg').classList.remove('hidden')}}
+if(!handleConfirmationRedirect())boot();
+</script>
+</body>
+</html>
